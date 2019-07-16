@@ -1,1 +1,1 @@
-{"ke'y1": {"key}2": "kekich", "key3": [1, 2]}, "{}as()[": [4, 5], "$!Q@#*": null, "end_key": "null"}
+{"test": {"null": "something", "key": [1, 2]}, "test1": [4, 5], "null_obj": null, "ke'y1": "null"}

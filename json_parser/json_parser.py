@@ -33,26 +33,17 @@ class JsonParser:
                              r')'
                              r'\A(?&json)\z')
 
-    # @staticmethod
-    # def is_valid(json: dict) -> bool:
-    #     if not isinstance(json, (int, float, str)):
-    #         if not isinstance(json, dict):
-    #             return False
-    #         else:
-    #             return not any((isinstance(v, (set, tuple)) for v in json.values()))
-    #     return True
-
     @staticmethod
-    def loads(json: str) -> dict:
+    def loads(input_str: str):
         null = None
         pcre.enable_re_template_mode()
-        json = pcre.match(JsonParser.__pattern, json)
+        json = pcre.match(JsonParser.__pattern, input_str)
+        if input_str.isdigit() or (input_str.startswith('-') and input_str[1:].isdigit()):
+            return input_str
         if json is None:
             raise SyntaxError('Invalid json format')
         json = json.group(0)
         res: dict = eval(json, {}, {'null': null})
-        # if not JsonParser.is_valid(res):
-        #     raise SyntaxError('Invalid json format')
         return res
 
     @staticmethod
