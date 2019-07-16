@@ -1,1 +1,1 @@
-python-pcre==0.7
+ python-pcre==0.7
