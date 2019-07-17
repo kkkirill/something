@@ -1,6 +1,5 @@
 import unittest
 from json_parser import JsonParser
-from json import (loads as l, dumps as d)
 from sys import argv, path
 
 
@@ -20,11 +19,15 @@ inputo = {
 
 class TestJsonParser(unittest.TestCase):
 
-    # def test_dumps(self):
-    #     print(f'{"-"*50}TESTING dumps{"-"*50}')
-    #     for k, v in inputo.items():
-    #         val = JsonParser.dumps(v)
-    #         self.assertEqual(val, inputs[k], f'Tested pair - {k} : {v}')
+    def test_dumps(self):
+        print(f'{"-"*50}TESTING dumps{"-"*50}')
+        for k, v in inputo.items():
+            try:
+                val = JsonParser.dumps(v)
+                self.assertEqual(val, inputs[k])
+                print(f'SUCCESS Tested value - {v}')
+            except SyntaxError as e:
+                print(f'FAILED with value - {v}', f'WITH ERROR - {e.msg}')
 
     def test_loads(self):
         print(f'{"-"*50}TESTING loads{"-"*50}')
