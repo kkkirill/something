@@ -28,7 +28,6 @@ class TestJsonParser(unittest.TestCase):
                 print(f'SUCCESS Tested value - {v}')
             except SyntaxError as e:
                 print(f'FAILED with value - {v}', f'WITH ERROR - {e.msg}')
-        # print('{line}TESTING dumps WITH TUPLE{line}'.format(line="-"*50))
         test_tuple_str = '''{"tuple_obj": [1, 2]}'''
         test_tuple_obj = {"tuple_obj": (1, 2)}
         val = JsonParser.dumps(test_tuple_obj)

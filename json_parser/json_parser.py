@@ -73,7 +73,7 @@ class JsonParser:
             if v is None:
                 iter_obj[k] = my_null
             elif isinstance(v, set):
-                raise SyntaxError('Objects of type set and tuple are not JSON serializable')
+                raise SyntaxError('Objects of type set are not JSON serializable')
             elif isinstance(v, tuple):
                 iter_obj[k] = list(v)
             if isinstance(v, (list, dict)):
