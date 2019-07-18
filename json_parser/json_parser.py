@@ -47,6 +47,15 @@ class JsonParser:
         return res
 
     @staticmethod
+    def __range_for_list_or_dict(iter_obj):
+        if isinstance(iter_obj, list):
+            return enumerate(iter_obj)
+        elif isinstance(iter_obj, dict):
+            return iter_obj.items()
+        else:
+            return ()
+
+    @staticmethod
     def dumps(iter_obj, counter=0) -> str:
         class null:
             def __repr__(self):
@@ -59,18 +68,18 @@ class JsonParser:
         my_null = null()
         if isinstance(iter_obj, dict):
             iter_obj = {mstr(k): mstr(val) if isinstance(val, str) else val for k, val in iter_obj.items()}
-            for k, v in iter_obj.items():
-                if v is None:
-                    iter_obj[k] = my_null
-                elif isinstance(v, (list, dict)):
-                    iter_obj[k] = JsonParser.dumps(v, counter + 1)
-        elif isinstance(iter_obj, list):
-            for i, v in enumerate(iter_obj):
-                if v is None:
-                    iter_obj[i] = my_null
-                elif isinstance(v, (list, dict)):
-                    iter_obj[i] = JsonParser.dumps(v, counter + 1)
-        return iter_obj if counter else str(iter_obj)
+
+        for k, v in JsonParser.__range_for_list_or_dict(iter_obj):
+            if v is None:
+                iter_obj[k] = my_null
+            elif isinstance(v, set):
+                raise SyntaxError('Objects of type set and tuple are not JSON serializable')
+            elif isinstance(v, tuple):
+                iter_obj[k] = list(v)
+            if isinstance(v, (list, dict)):
+                iter_obj[k] = JsonParser.dumps(v, counter + 1)
+
+        return iter_obj if counter else mstr(iter_obj)
 
 
 def main():
