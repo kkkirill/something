@@ -33,11 +33,11 @@ class JsonParser:
                              r')'
                              r'\A(?&json)\z')
 
-    @staticmethod
-    def loads(input_str: str):
+    @classmethod
+    def loads(cls, input_str: str):
         null = None
         pcre.enable_re_template_mode()
-        json = pcre.match(JsonParser.__pattern, input_str)
+        json = pcre.match(cls.__pattern, input_str)
         if input_str.isdigit() or (input_str.startswith('-') and input_str[1:].isdigit()):
             return input_str
         if json is None:
@@ -55,8 +55,8 @@ class JsonParser:
         else:
             return ()
 
-    @staticmethod
-    def dumps(iter_obj, counter=0) -> str:
+    @classmethod
+    def dumps(cls, iter_obj, counter=0) -> str:
         class null:
             def __repr__(self):
                 return self.__class__.__name__
@@ -69,7 +69,7 @@ class JsonParser:
         if isinstance(iter_obj, dict):
             iter_obj = {mstr(k): mstr(val) if isinstance(val, str) else val for k, val in iter_obj.items()}
 
-        for k, v in JsonParser.__range_for_list_or_dict(iter_obj):
+        for k, v in cls.__range_for_list_or_dict(iter_obj):
             if v is None:
                 iter_obj[k] = my_null
             elif isinstance(v, set):
@@ -77,7 +77,7 @@ class JsonParser:
             elif isinstance(v, tuple):
                 iter_obj[k] = list(v)
             if isinstance(v, (list, dict)):
-                iter_obj[k] = JsonParser.dumps(v, counter + 1)
+                iter_obj[k] = cls.dumps(v, counter + 1)
 
         return iter_obj if counter else mstr(iter_obj)
 
