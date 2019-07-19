@@ -68,6 +68,8 @@ class JsonParser:
         my_null = null()
         if isinstance(iter_obj, dict):
             iter_obj = {mstr(k): mstr(val) if isinstance(val, str) else val for k, val in iter_obj.items()}
+        elif isinstance(iter_obj, list):
+            iter_obj = [mstr(val) if isinstance(val, str) else val for val in iter_obj]
 
         for k, v in cls.__range_for_list_or_dict(iter_obj):
             if v is None:
