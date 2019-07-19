@@ -5,15 +5,22 @@ from sys import argv, path
 
 inputs = {
     'nulls': '''{"test": {"null": "something", "key": [1, 2]}, "test1": [4, 5], "null_obj": null, "ke'y1": "null"}''',
-    'with_other_iterables': '''{"tuple_obj": [4, 5], "set_obj": {2, 5}, "null_obj": "null"}''',
     'one_value': '''25''',
-    'incorrect_syntax': '''{"list_obj": [4, 5], '''
+    'incorrect_syntax': '''{"list_obj": [4, 5], ''',
+    "EXAMPLE": '''{"tags": ["dress", "black", "xxl"]}'''
 }
 
 inputo = {
     'nulls': {"test": {"null": "something", "key": [1, 2]}, "test1": [4, 5], "null_obj": None, "ke'y1": "null"},
-    'with_other_iterables': {"tuple_obj": (4, 5), "set_obj": {2, 5}, "null_obj": "null"},
     'one_value': '25',
+    'EXAMPLE': {"tags": ["dress", "black", "xxl"]},
+    'res_tuple_obj': {"tuple_obj": (1, 2)},
+    'res_set_obj': {"set_obj": {2, 5}}
+}
+
+specific_values = {
+    'res_tuple_obj': '''{"tuple_obj": [1, 2]}''',
+    'res_set_obj': '''{"set_obj": [2, 5]}'''
 }
 
 
@@ -24,15 +31,13 @@ class TestJsonParser(unittest.TestCase):
         for k, v in inputo.items():
             try:
                 val = JsonParser.dumps(v)
-                self.assertEqual(val, inputs[k])
-                print(f'SUCCESS Tested value - {v}')
+                if k in specific_values.keys():
+                    self.assertEqual(val, specific_values[k])
+                else:
+                    self.assertEqual(val, inputs[k])
+                print(f'SUCCESS Tested value - {v} RESULT VALUE - {val}')
             except SyntaxError as e:
                 print(f'FAILED with value - {v}', f'WITH ERROR - {e.msg}')
-        test_tuple_str = '''{"tuple_obj": [1, 2]}'''
-        test_tuple_obj = {"tuple_obj": (1, 2)}
-        val = JsonParser.dumps(test_tuple_obj)
-        self.assertEqual(val, test_tuple_str)
-        print(f'SUCCESS Tested value - {str(test_tuple_obj)}, Expected - {test_tuple_str}')
 
     def test_loads(self):
         print('{line}TESTING loads{line}'.format(line="-"*50))

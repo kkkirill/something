@@ -74,9 +74,7 @@ class JsonParser:
         for k, v in cls.__range_for_list_or_dict(iter_obj):
             if v is None:
                 iter_obj[k] = my_null
-            elif isinstance(v, set):
-                raise SyntaxError('Objects of type set are not JSON serializable')
-            elif isinstance(v, tuple):
+            elif isinstance(v, (tuple, set)):
                 iter_obj[k] = list(v)
             if isinstance(v, (list, dict)):
                 iter_obj[k] = cls.dumps(v, counter + 1)
