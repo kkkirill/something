@@ -65,6 +65,9 @@ class JsonParser:
             def __repr__(self):
                 return ''.join(('"', super().__repr__()[1:-1], '"'))
 
+        if isinstance(iter_obj, bool):
+            return mstr(mstr(iter_obj).lower())
+
         my_null = null()
         if isinstance(iter_obj, dict):
             iter_obj = {mstr(k): mstr(val) if isinstance(val, str) else val for k, val in iter_obj.items()}

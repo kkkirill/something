@@ -7,20 +7,24 @@ inputs = {
     'nulls': '''{"test": {"null": "something", "key": [1, 2]}, "test1": [4, 5], "null_obj": null, "ke'y1": "null"}''',
     'one_value': '''25''',
     'incorrect_syntax': '''{"list_obj": [4, 5], ''',
-    "EXAMPLE": '''{"tags": ["dress", "black", "xxl"]}'''
+    "EXAMPLE": '''{"tags": ["dress", "black", "xxl"]}''',
+    'int': '''2'''
 }
 
 inputo = {
     'nulls': {"test": {"null": "something", "key": [1, 2]}, "test1": [4, 5], "null_obj": None, "ke'y1": "null"},
     'one_value': '25',
     'EXAMPLE': {"tags": ["dress", "black", "xxl"]},
-    'res_tuple_obj': {"tuple_obj": (1, 2)},
-    'res_set_obj': {"set_obj": {2, 5}}
+    'tuple_obj': {"tuple_obj": (1, 2)},
+    'set_obj': {"set_obj": {2, 5}},
+    'bool': True,
+    'int': 2
 }
 
 specific_values = {
-    'res_tuple_obj': '''{"tuple_obj": [1, 2]}''',
-    'res_set_obj': '''{"set_obj": [2, 5]}'''
+    'tuple_obj': '''{"tuple_obj": [1, 2]}''',
+    'set_obj': '''{"set_obj": [2, 5]}''',
+    'bool': '''true'''
 }
 
 
@@ -35,7 +39,7 @@ class TestJsonParser(unittest.TestCase):
                     self.assertEqual(val, specific_values[k])
                 else:
                     self.assertEqual(val, inputs[k])
-                print(f'SUCCESS Tested value - {v} RESULT VALUE - {val}')
+                print(f'SUCCESS Tested value - {v} RESULT VALUE - {val.__repr__()}')
             except SyntaxError as e:
                 print(f'FAILED with value - {v}', f'WITH ERROR - {e.msg}')
 
