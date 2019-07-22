@@ -32,6 +32,7 @@ class JsonParser:
                              r'(?<NUMBER>(?>-?(?>0|[1-9][0-9]*)(?>\.[0-9]+)?(?>[eE][+-]?[0-9]+)?))'
                              r')'
                              r'\A(?&json)\z')
+    __valid_types = (dict, list, tuple, set, int, float, bool, str)
 
     @classmethod
     def loads(cls, input_str: str):
@@ -46,6 +47,11 @@ class JsonParser:
         res: dict = eval(json, {}, {'null': null})
         return res
 
+    @classmethod
+    def __is_invalid_type(cls, iter_obj):
+        return not any((isinstance(v, cls.__valid_types) for k, v in cls.__range_for_list_or_dict(iter_obj))) and \
+               not isinstance(iter_obj, (bool, int, str))
+
     @staticmethod
     def __range_for_list_or_dict(iter_obj):
         if isinstance(iter_obj, list):
@@ -56,7 +62,7 @@ class JsonParser:
             return ()
 
     @classmethod
-    def dumps(cls, iter_obj, counter=0) -> str:
+    def dumps(cls, iter_obj) -> str:
         class null:
             def __repr__(self):
                 return self.__class__.__name__
@@ -65,24 +71,31 @@ class JsonParser:
             def __repr__(self):
                 return ''.join(('"', super().__repr__()[1:-1], '"'))
 
-        if isinstance(iter_obj, bool):
-            return mstr(mstr(iter_obj).lower())
-
         my_null = null()
-        if isinstance(iter_obj, dict):
-            iter_obj = {mstr(k): mstr(val) if isinstance(val, str) else val for k, val in iter_obj.items()}
-        elif isinstance(iter_obj, list):
-            iter_obj = [mstr(val) if isinstance(val, str) else val for val in iter_obj]
 
-        for k, v in cls.__range_for_list_or_dict(iter_obj):
-            if v is None:
-                iter_obj[k] = my_null
-            elif isinstance(v, (tuple, set)):
-                iter_obj[k] = list(v)
-            if isinstance(v, (list, dict)):
-                iter_obj[k] = cls.dumps(v, counter + 1)
+        def serialize(iter_obj):
+            if cls.__is_invalid_type(iter_obj):
+                raise SyntaxError('Object is not JSON serializable')
 
-        return iter_obj if counter else mstr(iter_obj)
+            if isinstance(iter_obj, bool):
+                return mstr(mstr(iter_obj).lower())
+
+            if isinstance(iter_obj, dict):
+                iter_obj = {mstr(k): mstr(val) if isinstance(val, str) else val for k, val in iter_obj.items()}
+
+            for k, v in cls.__range_for_list_or_dict(iter_obj):
+                if v is None:
+                    iter_obj[k] = my_null
+                elif isinstance(v, str):
+                    iter_obj[k] = mstr(v)
+                elif isinstance(v, (tuple, set)):
+                    iter_obj[k] = list(v)
+                if isinstance(v, (list, dict)):
+                    iter_obj[k] = serialize(v)
+
+            return iter_obj
+
+        return mstr(serialize(iter_obj))
 
 
 def main():

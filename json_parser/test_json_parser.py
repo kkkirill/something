@@ -4,27 +4,31 @@ from sys import argv, path
 
 
 inputs = {
-    'nulls': '''{"test": {"null": "something", "key": [1, 2]}, "test1": [4, 5], "null_obj": null, "ke'y1": "null"}''',
+    'nulls': '''{"test": {"null": "something", "key": ["1", ["opa", 2]]}, "test1": [4, 5], "null_obj": null, "ke'y1": "null"}''',
     'one_value': '''25''',
     'incorrect_syntax': '''{"list_obj": [4, 5], ''',
     "EXAMPLE": '''{"tags": ["dress", "black", "xxl"]}''',
-    'int': '''2'''
+    'int': '''2''',
+    'opa': '''\"opa\"'''
 }
 
 inputo = {
-    'nulls': {"test": {"null": "something", "key": [1, 2]}, "test1": [4, 5], "null_obj": None, "ke'y1": "null"},
+    'nulls': {"test": {"null": "something", "key": ['1', ['opa', 2]]}, "test1": [4, 5], "null_obj": None, "ke'y1": "null"},
     'one_value': '25',
     'EXAMPLE': {"tags": ["dress", "black", "xxl"]},
     'tuple_obj': {"tuple_obj": (1, 2)},
     'set_obj': {"set_obj": {2, 5}},
     'bool': True,
-    'int': 2
+    'int': "2",
+    # 'lambda': {'x': lambda x: x},
+    'opa': '"opa"'
 }
 
 specific_values = {
     'tuple_obj': '''{"tuple_obj": [1, 2]}''',
     'set_obj': '''{"set_obj": [2, 5]}''',
-    'bool': '''true'''
+    'bool': '''true''',
+    'lambda': None
 }
 
 
@@ -36,9 +40,10 @@ class TestJsonParser(unittest.TestCase):
             try:
                 val = JsonParser.dumps(v)
                 if k in specific_values.keys():
-                    self.assertEqual(val, specific_values[k])
+                    # print(val.__repr__())
+                    self.assertEqual(specific_values[k], val)
                 else:
-                    self.assertEqual(val, inputs[k])
+                    self.assertEqual(inputs[k], val)
                 print(f'SUCCESS Tested value - {v} RESULT VALUE - {val.__repr__()}')
             except SyntaxError as e:
                 print(f'FAILED with value - {v}', f'WITH ERROR - {e.msg}')
@@ -53,7 +58,7 @@ class TestJsonParser(unittest.TestCase):
                 argv[2] = v
             try:
                 val = JsonParser.loads(v)
-                self.assertEqual(val, inputo[k])
+                self.assertEqual(inputo[k], val)
                 print(f'SUCCESS Tested value - {v}')
             except SyntaxError as e:
                 print(f'FAILED with value - {v}', f'WITH ERROR - {e.msg}')
