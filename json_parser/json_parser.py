@@ -72,7 +72,7 @@ class JsonParser:
             elif isinstance(iter_obj, dict):
                 return {mstr(k): serialize(v) for k, v in iter_obj.items()}
             else:
-                raise SyntaxError('Object is not JSON serializable')
+                raise SyntaxError(f'Object is not JSON serializable. Incorrect object type: {type(iter_obj)}')
 
         return mstr(serialize(iter_obj))
 
