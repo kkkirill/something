@@ -21,14 +21,16 @@ inputo = {
     'bool': True,
     'int': "2",
     # 'lambda': {'x': lambda x: x},
-    'opa': '"opa"'
+    'opa': '"opa"',
+    'test_list': [1, 2, 3, 4]
 }
 
 specific_values = {
     'tuple_obj': '''{"tuple_obj": [1, 2]}''',
     'set_obj': '''{"set_obj": [2, 5]}''',
     'bool': '''true''',
-    'lambda': None
+    'lambda': None,
+    'test_list': '''[1, 2, 3, 4]'''
 }
 
 
