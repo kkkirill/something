@@ -9,7 +9,8 @@ inputs = {
     'incorrect_syntax': '''{"list_obj": [4, 5], ''',
     "EXAMPLE": '''{"tags": ["dress", "black", "xxl"]}''',
     'int': '''2''',
-    'opa': '''\"opa\"'''
+    'opa': '''"print(\\"HELLO\\")"''',
+    'important': '''"\\"foo\\bar"'''
 }
 
 inputo = {
@@ -20,17 +21,20 @@ inputo = {
     'set_obj': {"set_obj": {2, 5}},
     'bool': True,
     'int': "2",
-    # 'lambda': {'x': lambda x: x},
-    'opa': '"opa"',
-    'test_list': [1, 2, 3, 4]
+    'test_list': [1, 2, 3, 4],
 }
 
-specific_values = {
+specific_dumps_values = {
     'tuple_obj': '''{"tuple_obj": [1, 2]}''',
     'set_obj': '''{"set_obj": [2, 5]}''',
     'bool': '''true''',
     'lambda': None,
     'test_list': '''[1, 2, 3, 4]'''
+}
+
+specific_loads_values = {
+    'opa': 'print("HELLO")',
+    'important': '"foo\bar'
 }
 
 
@@ -41,9 +45,9 @@ class TestJsonParser(unittest.TestCase):
         for k, v in inputo.items():
             try:
                 val = JsonParser.dumps(v)
-                if k in specific_values.keys():
+                if k in specific_dumps_values.keys():
                     # print(val.__repr__())
-                    self.assertEqual(specific_values[k], val)
+                    self.assertEqual(specific_dumps_values[k], val)
                 else:
                     self.assertEqual(inputs[k], val)
                 print(f'SUCCESS Tested value - {v} RESULT VALUE - {val.__repr__()}')
@@ -60,7 +64,10 @@ class TestJsonParser(unittest.TestCase):
                 argv[2] = v
             try:
                 val = JsonParser.loads(v)
-                self.assertEqual(inputo[k], val)
+                if k in specific_loads_values.keys():
+                    self.assertEqual(specific_loads_values[k], val)
+                else:
+                    self.assertEqual(inputo[k], val)
                 print(f'SUCCESS Tested value - {v}')
             except SyntaxError as e:
                 print(f'FAILED with value - {v}', f'WITH ERROR - {e.msg}')

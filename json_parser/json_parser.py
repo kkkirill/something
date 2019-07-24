@@ -41,9 +41,12 @@ class JsonParser:
         if input_str.isdigit() or (input_str.startswith('-') and input_str[1:].isdigit()):
             return input_str
         if json is None:
+            if input_str.startswith('"') and input_str.endswith('"'):
+                return eval(input_str, {}, {})
             raise SyntaxError('Invalid json format')
-        json = json.group(0)
-        res: dict = eval(json, {}, {'null': null})
+        else:
+            json = json.group(0)
+            res: dict = eval(json, {}, {'null': null})
         return res
 
     @staticmethod
