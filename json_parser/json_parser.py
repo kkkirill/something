@@ -1,4 +1,5 @@
 import pcre
+from ast import literal_eval as leval
 from sys import argv as a
 
 DOCSTRING = '''
@@ -42,7 +43,7 @@ class JsonParser:
             return input_str
         if json is None:
             if input_str.startswith('"') and input_str.endswith('"'):
-                return eval(input_str, {}, {})
+                return leval(input_str)
             raise SyntaxError('Invalid json format')
         else:
             json = json.group(0)
