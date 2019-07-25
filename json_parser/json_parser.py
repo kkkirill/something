@@ -1,4 +1,6 @@
 import pcre
+from pathlib import Path
+from requests import get
 from ast import literal_eval as leval
 from sys import argv as a
 
@@ -93,7 +95,6 @@ def main():
         print(DOCSTRING)
         return
     elif length in (2, 3) and argv[0] in FLAGS['f'] and (argv[2] in FLAGS['e'] if length == 3 else True):
-        from pathlib import Path
         if Path(argv[1]).is_file() and argv[1] != __file__:
             with open(argv[1], 'r', encoding=argv[2] if length == 3 else 'utf-8') as f:
                 json_str = f.readline()
@@ -104,7 +105,6 @@ def main():
         if argv[0] in FLAGS['s']:
             json_str = argv[1]
         elif argv[0] in FLAGS['u']:
-            from requests import get
             response = get(argv[1])
             if response.status_code == 200:
                 try:
