@@ -2,14 +2,14 @@ import pcre
 from pathlib import Path
 from requests import get
 from ast import literal_eval as leval
-from sys import argv as a
+from sys import argv
 
 DOCSTRING = '''
 Script expects minimum 2 arguments (if you don't want get help).
 Possible flags:
     -h|--help - for showing instructions
     -s|--str - to get json as string from arguments
-    -f|--file - to read json string from file 
+    -f|--file - to read json string from file
     -e|--encoding - to read from file in correct encoding (default: utf-8)
     -u|--url - to get json from url
 
@@ -83,41 +83,61 @@ class JsonParser:
         return mstr(serialize(iter_obj))
 
 
+def empty_args(func):
+    def wrapper(*args):
+        if not args:
+            return
+        return func(*args)
+    return wrapper
+
+
+@empty_args
+def get_json_from_file(values):
+    if Path(values[0]).is_file() and values[0] != __file__:
+        with open(values[0], 'r', encoding=values[1] if len(values) > 1 else 'utf-8') as f:
+            return ''.join(f.readlines()).strip()
+    else:
+        raise ValueError('Incorrect path to file')
+
+
+@empty_args
+def get_json_from_url(values):
+    response = get(values[0])
+    if response.status_code == 200:
+        if isinstance(response.json(), dict):  # throws ValueError
+            return response.content.decode()
+    else:
+        raise ValueError('Not valid url')
+
+
+@empty_args
+def get_json_from_str(values):
+    return values[0]
+
+
+def replace_long_flags(usr_flags):
+    for v in FLAGS.values():
+        usr_flags = usr_flags.replace(v[0], v[1])
+    return usr_flags
+
+
 def main():
-    argv = a[1:]
-    json_str = ''
-    length = len(argv)
-    if length and argv[0] in FLAGS['h']:
+    flags = replace_long_flags(' '.join(argv[1::2]).strip().lower())
+    if any(v in flags for v in FLAGS['h']):
         print(DOCSTRING)
         return
-    if length > 4 or length < 2:
-        print('Incorrect arguments')
-        print(DOCSTRING)
+    values = argv[::2][1:]
+    json_getters = {'-s': get_json_from_str, '-f': get_json_from_file, '-f -e': get_json_from_file,
+                    '-u': get_json_from_url}
+    print(flags, values, sep='\n')
+    try:
+        json_str = json_getters[flags](values) if flags in json_getters.keys() else None
+    except ValueError as e:
+        print(e)
         return
-    elif length in (2, 3) and argv[0] in FLAGS['f'] and (argv[2] in FLAGS['e'] if length == 3 else True):
-        if Path(argv[1]).is_file() and argv[1] != __file__:
-            with open(argv[1], 'r', encoding=argv[2] if length == 3 else 'utf-8') as f:
-                json_str = f.readline()
-        else:
-            print('Incorrect path to file')
-            return
-    elif length == 2:
-        if argv[0] in FLAGS['s']:
-            json_str = argv[1]
-        elif argv[0] in FLAGS['u']:
-            response = get(argv[1])
-            if response.status_code == 200:
-                try:
-                    if isinstance(response.json(), dict):
-                        json_str = response.content.decode()
-                except ValueError:
-                    print('Not valid json by url')
-            else:
-                print('Not valid url')
-                return
-        else:
-            print('Incorrect arguments')
-            return
+    if not json_str:
+        print('Wrong arguments')
+        return
     try:
         obj = JsonParser.loads(json_str)
         print('Result: ', type(obj), obj, sep='\n')
